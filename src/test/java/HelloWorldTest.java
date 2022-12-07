@@ -24,4 +24,11 @@ public class HelloWorldTest {
     String second = listMessages.get(1);
     System.out.println(second);
   }
+
+  @Test
+  public void testRedirect() {
+    Response response = RestAssured.given().redirects().follow(false).get("https://playground.learnqa.ru/api/long_redirect").andReturn();
+    String redirectUrl = response.getHeader("location");
+    System.out.println(redirectUrl);
+  }
 }
