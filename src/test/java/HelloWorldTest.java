@@ -1,9 +1,12 @@
 import io.restassured.RestAssured;
 import io.restassured.path.json.JsonPath;
 import io.restassured.response.Response;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import java.sql.Time;
 import java.util.List;
+
 
 public class HelloWorldTest {
   @Test
@@ -44,5 +47,26 @@ public class HelloWorldTest {
       count++;
     }
     System.out.println(count);
+  }
+
+  @Test
+  public void testToken() {
+    String url = "https://playground.learnqa.ru/ajax/api/longtime_job";
+    JsonPath response = RestAssured.get(url).jsonPath();
+    String token = response.getString("token");
+    int seconds = Integer.parseInt(response.getString("seconds"));
+
+    response = RestAssured.given().queryParam("token", token).get(url).jsonPath();
+    Assertions.assertEquals("Job is NOT ready", response.getString("status"));
+
+    try {
+      Thread.sleep(seconds * 1000);
+    } catch (InterruptedException e) {
+      e.printStackTrace();
+    }
+
+    response = RestAssured.given().queryParam("token", token).get(url).jsonPath();
+    Assertions.assertEquals("Job is ready", response.getString("status"));
+    Assertions.assertNotNull(response.getString("result"));
   }
 }
