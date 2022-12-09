@@ -1,9 +1,21 @@
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import io.restassured.RestAssured;
 import io.restassured.path.json.JsonPath;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import java.util.List;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.sql.SQLOutput;
+import java.util.*;
+import java.util.stream.Collectors;
 
 
 public class HelloWorldTest {
@@ -66,5 +78,60 @@ public class HelloWorldTest {
     response = RestAssured.given().queryParam("token", token).get(url).jsonPath();
     Assertions.assertEquals("Job is ready", response.getString("status"));
     Assertions.assertNotNull(response.getString("result"));
+  }
+
+  @Test
+  public void testPasswordSelection() {
+    String responsePhrase = "";
+    Object password = "";
+
+    List<Object> uniquePasswords = passwords().stream().distinct().collect(Collectors.toList());
+    for (Object uniquePassword : uniquePasswords) {
+      Map<String, Object> body = new HashMap<>();
+      body.put("login", "super_admin");
+      body.put("password", uniquePassword);
+
+      Response getSecretPassword = RestAssured
+              .given()
+              .body(body)
+              .when()
+              .post("https://playground.learnqa.ru/ajax/api/get_secret_password_homework")
+              .andReturn();
+      Assertions.assertTrue(getSecretPassword.getStatusCode() != 500);
+      String authCookie = getSecretPassword.getCookie("auth_cookie");
+
+      Response checkAuthCookie = RestAssured
+              .given()
+              .cookie("auth_cookie", authCookie)
+              .when()
+              .get("https://playground.learnqa.ru/ajax/api/check_auth_cookie")
+              .andReturn();
+      String checkAuthCookieResponse = checkAuthCookie.asString();
+      if (checkAuthCookieResponse.equals("You are authorized")) {
+        checkAuthCookie.print();
+        password = uniquePassword;
+        break;
+      }
+    }
+
+    System.out.println(responsePhrase);
+    System.out.println(password);
+  }
+
+  private List<Object> passwords() {
+    ObjectMapper objectMapper = new ObjectMapper();
+    List<Object> listOfPasswords = new ArrayList<>();
+    Map<String, Object> columnsWithPasswords = new HashMap<>();
+    try {
+      JsonNode jsonNode = objectMapper.readTree(new File("src/test/resources/Passwords.json"));
+      for (int i = 0;  i < 25; i ++) {
+        JsonNode childNode = jsonNode.get(i);
+        columnsWithPasswords.putAll(objectMapper.convertValue(childNode, new TypeReference<Map<String, Object>>(){}));
+        listOfPasswords.addAll(columnsWithPasswords.values());
+    }
+    } catch (IOException exception) {
+      exception.printStackTrace();
+    }
+    return listOfPasswords;
   }
 }
