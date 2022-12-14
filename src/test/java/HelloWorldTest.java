@@ -1,9 +1,11 @@
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import io.restassured.RestAssured;
+import io.restassured.http.Cookie;
 import io.restassured.path.json.JsonPath;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.Assertions;
@@ -124,6 +126,15 @@ public class HelloWorldTest {
   @ValueSource(strings = {"Какое-то непонятное количество символов", "Точно петнадцат"})
   public void testStringLength(String string) {
     Assertions.assertEquals(15, string.length(), "String length more than 15");
+  }
+
+  @Test
+  public void testCookie() {
+    Response response = RestAssured.get("https://playground.learnqa.ru/api/homework_cookie").andReturn();
+    Map<String, String> cookies = response.getCookies();
+    String cookie = "HomeWork";
+    Assertions.assertTrue(cookies.containsKey(cookie), "Response doesn't contain" + cookie + " cookie");
+    Assertions.assertEquals("hw_value", cookies.get(cookie), "The value of cookie " + cookie + " unexpected");
   }
 
   private List<Object> passwords() {
