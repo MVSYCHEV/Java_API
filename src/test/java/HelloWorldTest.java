@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import io.restassured.RestAssured;
 import io.restassured.http.Cookie;
+import io.restassured.http.Headers;
 import io.restassured.path.json.JsonPath;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.Assertions;
@@ -135,6 +136,15 @@ public class HelloWorldTest {
     String cookie = "HomeWork";
     Assertions.assertTrue(cookies.containsKey(cookie), "Response doesn't contain" + cookie + " cookie");
     Assertions.assertEquals("hw_value", cookies.get(cookie), "The value of cookie " + cookie + " unexpected");
+  }
+
+  @Test
+  public void testHeader() {
+    Response response = RestAssured.get("https://playground.learnqa.ru/api/homework_header").andReturn();
+    Headers headers = response.getHeaders();
+    String header = "x-secret-homework-header";
+    Assertions.assertTrue(headers.hasHeaderWithName(header));
+    Assertions.assertEquals("Some secret value", headers.getValue(header), "Unexpected value of header " + header);
   }
 
   private List<Object> passwords() {
