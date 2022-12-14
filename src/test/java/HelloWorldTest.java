@@ -1,14 +1,12 @@
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
 import io.restassured.RestAssured;
-import io.restassured.http.Cookie;
 import io.restassured.http.Headers;
 import io.restassured.path.json.JsonPath;
 import io.restassured.response.Response;
+import io.restassured.specification.RequestSpecification;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -16,14 +14,17 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.sql.SQLOutput;
 import java.util.*;
 import java.util.stream.Collectors;
 
 
 public class HelloWorldTest {
+  public final String firstUserAgent = "Mozilla/5.0 (Linux; U; Android 4.0.2; en-us; Galaxy Nexus Build/ICL53F) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30";
+  public final String secondUserAgent = "Mozilla/5.0 (iPad; CPU OS 13_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/91.0.4472.77 Mobile/15E148 Safari/604.1";
+  public final String thirdUserAgent = "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)";
+  public final String fourthUserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.77 Safari/537.36 Edg/91.0.100.0";
+  public final String fifthUserAgent = "'Mozilla/5.0 (iPad; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1";
+
   @Test
   public void testHelloWorld() {
     System.out.println("Hello from Misha :)");
@@ -145,6 +146,64 @@ public class HelloWorldTest {
     String header = "x-secret-homework-header";
     Assertions.assertTrue(headers.hasHeaderWithName(header));
     Assertions.assertEquals("Some secret value", headers.getValue(header), "Unexpected value of header " + header);
+  }
+
+  @ParameterizedTest
+  @ValueSource(strings = {firstUserAgent, secondUserAgent, thirdUserAgent, fourthUserAgent, fifthUserAgent})
+  public void testUserAgent(String userAgent) {
+    RequestSpecification specification = RestAssured.given();
+    specification.baseUri("https://playground.learnqa.ru/ajax/api/user_agent_check");
+    String userAgentHeader = "User-Agent";
+
+    switch (userAgent) {
+      case firstUserAgent:
+        specification.header(userAgentHeader, firstUserAgent);
+        break;
+      case secondUserAgent:
+        specification.header(userAgentHeader, secondUserAgent);
+        break;
+      case thirdUserAgent:
+        specification.header(userAgentHeader, thirdUserAgent);
+        break;
+      case fourthUserAgent:
+        specification.header(userAgentHeader, fourthUserAgent);
+        break;
+      case fifthUserAgent:
+        specification.header(userAgentHeader, fifthUserAgent);
+        break;
+      default:
+        throw new IllegalArgumentException("Unexpected User Agent header");
+    }
+
+    JsonPath response = specification.get().jsonPath();
+
+    switch (userAgent) {
+      case firstUserAgent:
+        Assertions.assertEquals("Mobile", response.getString("platform"), "Incorrect platform in " + firstUserAgent);
+        Assertions.assertEquals("No", response.getString("browser"), "Incorrect browser in " + firstUserAgent);
+        Assertions.assertEquals("Android", response.getString("device"), "Incorrect device in " + firstUserAgent);
+        break;
+      case secondUserAgent:
+        Assertions.assertEquals("Mobile", response.getString("platform"), "Incorrect platform in " + secondUserAgent);
+        Assertions.assertEquals("Chrome", response.getString("browser"), "Incorrect browser in " + secondUserAgent);
+        Assertions.assertEquals("iOS", response.getString("device"), "Incorrect device in " + secondUserAgent);
+        break;
+      case thirdUserAgent:
+        Assertions.assertEquals("Googlebot", response.getString("platform"), "Incorrect platform in " + thirdUserAgent);
+        Assertions.assertEquals("Unknown", response.getString("browser"), "Incorrect browser in " + thirdUserAgent);
+        Assertions.assertEquals("Unknown", response.getString("device"), "Incorrect device in " + thirdUserAgent);
+        break;
+      case fourthUserAgent:
+        Assertions.assertEquals("Web", response.getString("platform"), "Incorrect platform in " + fourthUserAgent);
+        Assertions.assertEquals("Chrome", response.getString("browser"), "Incorrect browser in " + fourthUserAgent);
+        Assertions.assertEquals("No", response.getString("device"), "Incorrect device in " + fourthUserAgent);
+        break;
+      case fifthUserAgent:
+        Assertions.assertEquals("Mobile", response.getString("platform"), "Incorrect platform in " + fifthUserAgent);
+        Assertions.assertEquals("No", response.getString("browser"), "Incorrect browser in " + fifthUserAgent);
+        Assertions.assertEquals("iPhone", response.getString("device"), "Incorrect device in " + fifthUserAgent);
+        break;
+    }
   }
 
   private List<Object> passwords() {
