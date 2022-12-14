@@ -8,6 +8,8 @@ import io.restassured.path.json.JsonPath;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import java.io.File;
 import java.io.IOException;
@@ -118,17 +120,24 @@ public class HelloWorldTest {
     System.out.println(password);
   }
 
+  @ParameterizedTest
+  @ValueSource(strings = {"Какое-то непонятное количество символов", "Точно петнадцат"})
+  public void testStringLength(String string) {
+    Assertions.assertEquals(15, string.length(), "String length more than 15");
+  }
+
   private List<Object> passwords() {
     ObjectMapper objectMapper = new ObjectMapper();
     List<Object> listOfPasswords = new ArrayList<>();
     Map<String, Object> columnsWithPasswords = new HashMap<>();
     try {
       JsonNode jsonNode = objectMapper.readTree(new File("src/test/resources/Passwords.json"));
-      for (int i = 0;  i < 25; i ++) {
+      for (int i = 0; i < 25; i++) {
         JsonNode childNode = jsonNode.get(i);
-        columnsWithPasswords.putAll(objectMapper.convertValue(childNode, new TypeReference<Map<String, Object>>(){}));
+        columnsWithPasswords.putAll(objectMapper.convertValue(childNode, new TypeReference<Map<String, Object>>() {
+        }));
         listOfPasswords.addAll(columnsWithPasswords.values());
-    }
+      }
     } catch (IOException exception) {
       exception.printStackTrace();
     }
