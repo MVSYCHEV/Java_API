@@ -34,6 +34,7 @@ public class UserRegisterTest extends BaseTestCase {
   @DisplayName("Registration with new email")
   public void testCreateUserSuccessfully(){
     Response responseCreateAuth = apiCoreRequests.makePostRegistrationRequest();
+    responseCreateAuth.prettyPrint();
     Assertions.assertResponseCodeEquals(200, responseCreateAuth);
     Assertions.assertJsonHasField("id", responseCreateAuth);
   }

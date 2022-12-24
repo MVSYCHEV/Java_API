@@ -16,6 +16,12 @@ public class ApiCoreRequests {
             .get(method.toString()).andReturn();
   }
 
+  @Step("Make a GET-request with token and auth cookie")
+  public Response makeGetRequest(String method, String token, String cookie) {
+    return given().filter(new AllureRestAssured()).header(new Header(BaseTestCase.headerName, token)).cookie(BaseTestCase.cookieName, cookie)
+            .get(method).andReturn();
+  }
+
   @Step("Make a GET-request with auth cookie only")
   public Response makeGetRequestWithCookie(ApiMethods method, String cookie) {
     return given().filter(new AllureRestAssured()).cookie(BaseTestCase.cookieName, cookie).get(method.toString()).andReturn();
@@ -31,6 +37,11 @@ public class ApiCoreRequests {
     return given().filter(new AllureRestAssured()).body(authData).post(method.toString()).andReturn();
   }
 
+  @Step("Make a GET-request")
+  public Response makeGetRequest(String method) {
+    return given().filter(new AllureRestAssured()).get(method).andReturn();
+  }
+
   @Step("Make a registration POST-request for new user")
   public Response makePostRegistrationRequest() {
     return makePostRequest(ApiMethods.CREATE_USER, DataGenerator.getRegistrationData());
@@ -44,5 +55,15 @@ public class ApiCoreRequests {
   @Step("Make a registration POST-request for new user with custom body")
   public Response makePostRegistrationRequestWithBody(Map<String, String> params) {
     return makePostRequest(ApiMethods.CREATE_USER, params);
+  }
+
+  @Step("Make a GET-request for receive userData")
+  public Response makeGetRequestReceiveUserData(int userId) {
+    return makeGetRequest(ApiMethods.CREATE_USER.toString().concat(String.valueOf(userId)));
+  }
+
+  @Step("Make a GET-request for receive userData as authorized user")
+  public Response makeGetRequestReceiveUserData(String header, String cookie, int userId) {
+    return makeGetRequest(ApiMethods.CREATE_USER.toString().concat(String.valueOf(userId)), header, cookie);
   }
 }
