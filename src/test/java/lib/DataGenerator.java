@@ -37,6 +37,16 @@ public class DataGenerator {
     return userData;
   }
 
+  public static Map<String, String> getRegistrationDataWithoutParameter(String parameter) {
+    Map<String, String> defaultValues = getRegistrationData();
+    if (defaultValues.containsKey(parameter)) {
+      defaultValues.remove(parameter);
+    } else {
+      System.out.println("A parameter " + parameter + " isn't obligatory");
+    }
+    return defaultValues;
+  }
+
   public static Map<String, String> getAuthorizationData() {
     Map<String, String> authData = new HashMap<>();
     authData.put("email", "vinkotov@example.com");

@@ -6,7 +6,8 @@ public enum  ApiMethods {
    */
 
   USER_LOGIN("https://playground.learnqa.ru/api/user/login"),
-  USER_AUTHORIZATION("https://playground.learnqa.ru/api/user/auth");
+  USER_AUTHORIZATION("https://playground.learnqa.ru/api/user/auth"),
+  CREATE_USER("https://playground.learnqa.ru/api/user/");
 
   private final String method;
 
