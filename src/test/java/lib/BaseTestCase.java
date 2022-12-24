@@ -8,6 +8,10 @@ import static org.hamcrest.Matchers.hasKey;
 import java.util.Map;
 
 public class BaseTestCase {
+  protected static final String headerName = "x-csrf-token";
+  protected static final String cookieName = "auth_sid";
+  protected static final String userIdName = "user_id";
+
   protected String getHeader(Response response, String headerName) {
     Headers headers = response.getHeaders();
     Assertions.assertTrue(headers.hasHeaderWithName(headerName), "Response doesn't contain header with name " + headerName);

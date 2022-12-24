@@ -1,64 +1,53 @@
 package test;
 
-import io.restassured.RestAssured;
+import io.qameta.allure.Description;
+import io.qameta.allure.Epic;
+import io.qameta.allure.Feature;
 import io.restassured.response.Response;
-import io.restassured.specification.RequestSpecification;
-import lib.BaseTestCase;
+import lib.*;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-import lib.Assertions;
 
-import java.util.HashMap;
-import java.util.Map;
-
+@Epic("Authorisation cases")
+@Feature("Authorization")
 public class UserAuthTest extends BaseTestCase {
-  private final String cookieName = "auth_sid";
-  private final String headerName = "x-csrf-token";
-  private final String userIdName = "user_id";
   private String cookieValue;
   private String headerValue;
   private int userIdOnAuthValue;
-
-  private final String userAuthMethod = "https://playground.learnqa.ru/api/user/auth";
+  private final ApiCoreRequests apiCoreRequests = new ApiCoreRequests();
 
   @BeforeEach
   public void loginUser() {
-    Map<String, String> authData = new HashMap<>();
-    authData.put("email", "vinkotov@example.com");
-    authData.put("password", "1234");
-
-    Response responseGetAuth = RestAssured.given().body(authData)
-            .post("https://playground.learnqa.ru/api/user/login").andReturn();
-
-    this.cookieValue = getCookie(responseGetAuth, cookieName);
-    this.headerValue = getHeader(responseGetAuth, headerName);
-    this.userIdOnAuthValue = getIntFromJson(responseGetAuth, userIdName);
+    Response responseGetAuth = apiCoreRequests.makePostRequest(ApiMethods.USER_LOGIN, DataGenerator.getAuthorizationData());
+    this.cookieValue = getCookie(responseGetAuth, BaseTestCase.cookieName);
+    this.headerValue = getHeader(responseGetAuth, BaseTestCase.headerName);
+    this.userIdOnAuthValue = getIntFromJson(responseGetAuth, BaseTestCase.userIdName);
   }
 
   @Test
+  @Description("This test successfully authorize user by email and password")
+  @DisplayName("Test positive auth user")
   public void testAuthUser() {
-    Response responseCheckAuth = RestAssured.given()
-            .header(headerName, headerValue).cookie(cookieName, cookieValue)
-            .get(userAuthMethod).andReturn();
-    Assertions.assertJsonByName(responseCheckAuth, userIdName, userIdOnAuthValue);
+    Response responseCheckAuth = apiCoreRequests.makeGetRequest(ApiMethods.USER_AUTHORIZATION, headerValue, cookieValue);
+    Assertions.assertJsonByName(responseCheckAuth, BaseTestCase.userIdName, userIdOnAuthValue);
   }
 
+  @Description("This test check authorization status w/o sending auth cookie or token")
+  @DisplayName("Test negative auth user")
   @ParameterizedTest
   @ValueSource(strings = {"cookie", "headers"})
   public void testNegativeAuthUser(String condition) {
-    RequestSpecification specification = RestAssured.given().baseUri(userAuthMethod);
-
     if (condition.equals("cookie")) {
-      specification.cookie(cookieName, cookieValue);
+      Response responseForCheck = apiCoreRequests.makeGetRequestWithCookie(ApiMethods.USER_AUTHORIZATION, cookieValue);
+      Assertions.assertJsonByName(responseForCheck, BaseTestCase.userIdName, 0);
     } else if (condition.equals("headers")) {
-      specification.header(headerName, headerValue);
+      Response responseForCheck = apiCoreRequests.makeGetRequestWithToken(ApiMethods.USER_AUTHORIZATION, headerValue);
+      Assertions.assertJsonByName(responseForCheck, BaseTestCase.userIdName, 0);
     } else {
       throw new IllegalArgumentException("Condition value isn't known " + condition);
     }
-
-    Response responseForCheck = specification.get().andReturn();
-    Assertions.assertJsonByName(responseForCheck, userIdName, 0);
   }
 }
