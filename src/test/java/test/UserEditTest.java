@@ -24,6 +24,7 @@ public class UserEditTest extends BaseTestCase {
   private String loginCookie;
   private final String firstNameField = "firstName";
   private final String emailField = "email";
+  private final String passwordField = "password";
   private final String newFirstName = "Changed Name";
 
   @BeforeEach
@@ -32,7 +33,7 @@ public class UserEditTest extends BaseTestCase {
     Response responseCreateAuth = apiCoreRequests.makePostRegistrationRequestWithBody(userData);
     userId = getStringFromJson(responseCreateAuth, "id");
     authEmail = userData.get(emailField);
-    authPassword = userData.get("password");
+    authPassword = userData.get(passwordField);
     firstNameBeforeEdit = userData.get(firstNameField);
   }
 
@@ -64,7 +65,7 @@ public class UserEditTest extends BaseTestCase {
   @DisplayName("Edit user data as different user")
   public void testEditAsDifferentUser() {
     //login as default user
-    login(DataGenerator.getAuthorizationData().get("email"), DataGenerator.getAuthorizationData().get("password"));
+    login(DataGenerator.getAuthorizationData().get(emailField), DataGenerator.getAuthorizationData().get(passwordField));
     String defaultUserHeader = loginHeader;
     String defaultUserCookie = loginCookie;
 
@@ -108,8 +109,8 @@ public class UserEditTest extends BaseTestCase {
 
   private void login(String email, String password) {
     Map<String, String> authData = new HashMap<>();
-    authData.put("email", email);
-    authData.put("password", password);
+    authData.put(emailField, email);
+    authData.put(passwordField, password);
     Response responseGetAuth = apiCoreRequests.makePostRequest(ApiMethods.USER_LOGIN, authData);
     loginHeader = getHeader(responseGetAuth, BaseTestCase.headerName);
     loginCookie = getCookie(responseGetAuth, BaseTestCase.cookieName);

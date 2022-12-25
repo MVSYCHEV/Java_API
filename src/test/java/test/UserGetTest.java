@@ -12,7 +12,6 @@ import org.junit.jupiter.api.Test;
 @Feature("Get user information")
 public class UserGetTest extends BaseTestCase {
   ApiCoreRequests apiCoreRequests = new ApiCoreRequests();
-  private final String getUserMethod = "https://playground.learnqa.ru/api/user/2";
 
   @Test
   @Description("Test check receive user data as unauthorized user")

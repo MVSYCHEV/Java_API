@@ -98,4 +98,14 @@ public class ApiCoreRequests {
   public Response makePutRequestUnauthorized(String userId, Map<String, String> body) {
     return given().filter(new AllureRestAssured()).body(body).put(ApiMethods.CREATE_USER.toString().concat(userId)).andReturn();
   }
+
+  /**
+   * Methods for delete user
+   */
+
+  @Step("Make DELETE-request for delete user by id")
+  public Response makeDeleteRequestUser(String header, String cookie, String userId) {
+    return given().filter(new AllureRestAssured()).header(BaseTestCase.headerName, header)
+            .cookie(BaseTestCase.cookieName, cookie).delete(ApiMethods.CREATE_USER.toString().concat(userId)).andReturn();
+  }
 }
