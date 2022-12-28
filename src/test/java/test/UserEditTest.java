@@ -1,8 +1,6 @@
 package test;
 
-import io.qameta.allure.Description;
-import io.qameta.allure.Epic;
-import io.qameta.allure.Feature;
+import io.qameta.allure.*;
 import io.restassured.response.Response;
 import lib.*;
 import org.junit.jupiter.api.BeforeEach;
@@ -40,6 +38,7 @@ public class UserEditTest extends BaseTestCase {
   @Test
   @Description("Test check edit created user data")
   @DisplayName("Test check edit created user data")
+  @Severity(SeverityLevel.BLOCKER)
   public void editJustCreatedTest() {
     login(authEmail, authPassword);
 // Edit User
@@ -51,6 +50,7 @@ public class UserEditTest extends BaseTestCase {
   @Test
   @Description("Test check edit user data, when user is unauthorized")
   @DisplayName("Edit user data as unauthorized user")
+  @Severity(SeverityLevel.NORMAL)
   public void testEditAsUnauthorized() {
     login(authEmail, authPassword);
     // Edit User
@@ -63,6 +63,7 @@ public class UserEditTest extends BaseTestCase {
   @Test
   @Description("Test check edit user data, as different user")
   @DisplayName("Edit user data as different user")
+  @Severity(SeverityLevel.BLOCKER)
   public void testEditAsDifferentUser() {
     //login as default user
     login(DataGenerator.getAuthorizationData().get(emailField), DataGenerator.getAuthorizationData().get(passwordField));
@@ -82,6 +83,7 @@ public class UserEditTest extends BaseTestCase {
   @Test
   @Description("Test check edit user email with incorrect email")
   @DisplayName("Edit user incorrect email")
+  @Severity(SeverityLevel.MINOR)
   public void testEditIncorrectEmail() {
     login(authEmail, authPassword);
 
@@ -96,6 +98,7 @@ public class UserEditTest extends BaseTestCase {
   @Test
   @Description("Test check edit user email with short firstName")
   @DisplayName("Edit user short firstName")
+  @Severity(SeverityLevel.MINOR)
   public void testEditShortFirstName() {
     login(authEmail, authPassword);
 

@@ -1,8 +1,6 @@
 package test;
 
-import io.qameta.allure.Description;
-import io.qameta.allure.Epic;
-import io.qameta.allure.Feature;
+import io.qameta.allure.*;
 import io.restassured.response.Response;
 import lib.*;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -22,6 +20,7 @@ public class UserRegisterTest extends BaseTestCase {
   @Test
   @Description("Test check registration with existing email")
   @DisplayName("Registration with existing email")
+  @Severity(SeverityLevel.CRITICAL)
   public void testCreateUserWithExistingEmail(){
     String email = "vinkotov@example.com";
     Response responseCreateAuth = apiCoreRequests.makePostRegistrationRequestWithParam(createUserBody("email", email));
@@ -32,6 +31,7 @@ public class UserRegisterTest extends BaseTestCase {
   @Test
   @Description("Test check registration with new email")
   @DisplayName("Registration with new email")
+  @Severity(SeverityLevel.BLOCKER)
   public void testCreateUserSuccessfully(){
     Response responseCreateAuth = apiCoreRequests.makePostRegistrationRequest();
     Assertions.assertResponseCodeEquals(200, responseCreateAuth);
@@ -41,6 +41,7 @@ public class UserRegisterTest extends BaseTestCase {
   @Test
   @Description("Test check registration with incorrect email, w/o @")
   @DisplayName("Registration with incorrect email")
+  @Severity(SeverityLevel.NORMAL)
   public void testCreateUserWithIncorrectEmail() {
     String incorrectEmail = "example.com";
     Response responseCreateAuth = apiCoreRequests.makePostRegistrationRequestWithParam(createUserBody("email", incorrectEmail));
@@ -50,6 +51,7 @@ public class UserRegisterTest extends BaseTestCase {
 
   @Description("Test check registration with empty obligatory parameter")
   @DisplayName("Registration with empty obligatory parameters")
+  @Severity(SeverityLevel.NORMAL)
   @ParameterizedTest
   @ValueSource(strings = {"username", "firstName", "lastName", "email", "password"})
   public void testCreateUserWithEmptyParameter(String parameter) {
@@ -60,6 +62,7 @@ public class UserRegisterTest extends BaseTestCase {
 
   @Description("Test check registration w/o obligatory parameter")
   @DisplayName("Registration without obligatory parameters")
+  @Severity(SeverityLevel.NORMAL)
   @ParameterizedTest
   @ValueSource(strings = {"username", "firstName", "lastName", "email", "password"})
   public void testCreateUserWithoutParameter(String parameter) {
@@ -70,6 +73,7 @@ public class UserRegisterTest extends BaseTestCase {
 
   @Description("Test check registration with short username and firstName")
   @DisplayName("Registration with short username and firstName")
+  @Severity(SeverityLevel.MINOR)
   @ParameterizedTest
   @ValueSource(strings = {"username", "firstName"})
   public void testCreateUserWithShortUsernameAndFirstName(String parameter) {
@@ -81,6 +85,7 @@ public class UserRegisterTest extends BaseTestCase {
 
   @Description("Test check registration with long username and firstName")
   @DisplayName("Registration with long username and firstName")
+  @Severity(SeverityLevel.MINOR)
   @ParameterizedTest
   @ValueSource(strings = {"username", "firstName"})
   public void testCreateUserWithLongUsernameAndFirstName(String parameter) {

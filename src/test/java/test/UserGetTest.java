@@ -1,8 +1,6 @@
 package test;
 
-import io.qameta.allure.Description;
-import io.qameta.allure.Epic;
-import io.qameta.allure.Feature;
+import io.qameta.allure.*;
 import io.restassured.response.Response;
 import lib.*;
 import org.junit.jupiter.api.DisplayName;
@@ -16,6 +14,7 @@ public class UserGetTest extends BaseTestCase {
   @Test
   @Description("Test check receive user data as unauthorized user")
   @DisplayName("Get user data as unauthorized user")
+  @Severity(SeverityLevel.NORMAL)
   public void testGetUserDataNotAuth() {
     Response responseUserData = apiCoreRequests.makeGetRequestReceiveUserData(2);
     Assertions.assertJsonHasField("username", responseUserData);
@@ -27,6 +26,7 @@ public class UserGetTest extends BaseTestCase {
   @Test
   @Description("Test check receive user data as the same user")
   @DisplayName("Get user data as the same user")
+  @Severity(SeverityLevel.BLOCKER)
   public void testGetUserDetailsAuthAsSameUser() {
     Response responseGetAuth = apiCoreRequests.makePostRequest(ApiMethods.USER_LOGIN, DataGenerator.getAuthorizationData());
     String header = getHeader(responseGetAuth, BaseTestCase.headerName);
@@ -40,6 +40,7 @@ public class UserGetTest extends BaseTestCase {
   @Test
   @Description("Test check receiving user data, when we authorized as different user")
   @DisplayName("Get user data as different user")
+  @Severity(SeverityLevel.CRITICAL)
   public void testGetUserDetailsAuthAsDifferentUser() {
     // create new user, which details we want to get
     Response responseCreate = apiCoreRequests.makePostRegistrationRequest();

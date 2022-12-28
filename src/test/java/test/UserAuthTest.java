@@ -1,8 +1,6 @@
 package test;
 
-import io.qameta.allure.Description;
-import io.qameta.allure.Epic;
-import io.qameta.allure.Feature;
+import io.qameta.allure.*;
 import io.restassured.response.Response;
 import lib.*;
 import org.junit.jupiter.api.BeforeEach;
@@ -30,6 +28,7 @@ public class UserAuthTest extends BaseTestCase {
   @Test
   @Description("This test successfully authorize user by email and password")
   @DisplayName("Test positive auth user")
+  @Severity(SeverityLevel.BLOCKER)
   public void testAuthUser() {
     Response responseCheckAuth = apiCoreRequests.makeGetRequest(ApiMethods.USER_AUTHORIZATION, headerValue, cookieValue);
     Assertions.assertJsonByName(responseCheckAuth, BaseTestCase.userIdName, userIdOnAuthValue);
@@ -37,6 +36,7 @@ public class UserAuthTest extends BaseTestCase {
 
   @Description("This test check authorization status w/o sending auth cookie or token")
   @DisplayName("Test negative auth user")
+  @Severity(SeverityLevel.CRITICAL)
   @ParameterizedTest
   @ValueSource(strings = {"cookie", "headers"})
   public void testNegativeAuthUser(String condition) {

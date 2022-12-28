@@ -1,8 +1,6 @@
 package test;
 
-import io.qameta.allure.Description;
-import io.qameta.allure.Epic;
-import io.qameta.allure.Feature;
+import io.qameta.allure.*;
 import io.restassured.response.Response;
 import lib.*;
 import org.junit.jupiter.api.DisplayName;
@@ -25,6 +23,7 @@ public class UserDeleteTest extends BaseTestCase {
   @Test
   @Description("Test check delete default user with id 2")
   @DisplayName("Test check delete default user")
+  @Severity(SeverityLevel.MINOR)
   public void testDeleteDefaultUser() {
       Response responseLoginAsDefaultUser = apiCoreRequests.makePostRequest(ApiMethods.USER_LOGIN, DataGenerator.getAuthorizationData());
       loginHeader = getHeader(responseLoginAsDefaultUser, BaseTestCase.headerName);
@@ -42,6 +41,7 @@ public class UserDeleteTest extends BaseTestCase {
   @Test
   @Description("Test check delete created user")
   @DisplayName("Test check delete created user")
+  @Severity(SeverityLevel.BLOCKER)
   public void testDeleteCreatedUser() {
     createUser();
     login(authEmail, authPassword);
@@ -52,6 +52,7 @@ public class UserDeleteTest extends BaseTestCase {
   @Test
   @Description("Test check delete user from another user account")
   @DisplayName("Test check delete another user")
+  @Severity(SeverityLevel.BLOCKER)
   public void testDeleteUserAsAnotherUser() {
     createUser();
 
